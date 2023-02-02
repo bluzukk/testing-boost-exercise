@@ -1,0 +1,67 @@
+name:
+
+on: push
+
+
+# jobs:
+#   style:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: actions/setup-python@v2
+#       - name: "Install dependencies"
+#         run: |
+#           apt update
+#           apt install
+#           apt install -y clang-format
+#           export DEBIAN_FRONTEND="noninteractive"
+#           apt-get update && apt-get install -y apt-utils curl wget cmake build-essential
+#           apt-get install -y libboost-filesystem-dev libboost-container-dev
+#
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Install dependencies"
+        run: |
+          export DEBIAN_FRONTEND="noninteractive"
+          apt update
+          apt install -y cmake build-essential
+          apt install -y libboost-filesystem-dev libboost-container-dev
+          apt install -y libeigen3-dev
+          apt install -y libyaml-dev
+
+      - name: "Build..."
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make -j
+
+      # - name: "Upload coverage report (artifact)"
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: coverage
+      #     path: .coverage
+      #     retention-days: 1
+
+  # test:
+  #   needs: test
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     PROJECT_NAME: "Automation Lecture"
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: "Download coverage report (artifact)"
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: coverage
+  #
+  #     - name: "Upload coverage report (XML) (artifact)"
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: coverage-xml
+  #         path: coverage.xml
+  #         retention-days: 14
+
