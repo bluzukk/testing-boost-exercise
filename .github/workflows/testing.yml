@@ -1,4 +1,4 @@
-name: CI
+name: ci
 
 on: push
 
@@ -13,8 +13,9 @@ jobs:
           sudo apt install -y clang-format
       - name: "Run stylecheck"
         run: |
-          clang-format --dry-run src/* tests/*
-          clang-format -i src/* tests/* > /dev/null 2>&1 || echo "Consider the following changes: " && git --no-pager diff && >&2 echo ""
+          clang-format -Werror --dry-run src/* tests/*
+          #clang-format -i src/* tests/* > /dev/null 2>&1 || echo "Consider the following changes: " && git --no-pager diff && exit -1
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -26,7 +27,7 @@ jobs:
           sudo apt install -y cmake build-essential libeigen3-dev
           sudo apt install -y libyaml-cpp-dev
           sudo apt install -y libboost-all-dev
-      - name: "Build..."
+      - name: "Build ..."
         run: |
           mkdir -p build && cd build
           cmake .. && make -j4 && cd ..
@@ -34,24 +35,19 @@ jobs:
         with:
           name: build
           path: ./build
-          retention-days: 7
+          retention-days: 3
 
-  # test:
-  #   needs: test
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     PROJECT_NAME: "Automation Lecture"
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: "Download coverage report (artifact)"
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: coverage
-  #
-  #     - name: "Upload coverage report (XML) (artifact)"
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: coverage-xml
-  #         path: coverage.xml
-  #         retention-days: 14
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_NAME: "Automation Lecture"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: build
+        run : |
+          ls
+
 
