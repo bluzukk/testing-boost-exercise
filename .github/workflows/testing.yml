@@ -45,7 +45,7 @@ jobs:
                 -DCMAKE_BUILD_TYPE=${{ matrix.compiler.type }} .. \
               && make -j4 \
               && cd ..
-          tar -czvf build.tar.gz build
+          tar -czf build.tar.gz build
       - uses: actions/upload-artifact@v2
         with:
           name: build
