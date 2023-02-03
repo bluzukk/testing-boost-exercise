@@ -23,8 +23,10 @@ jobs:
     strategy:
       matrix:
         compiler:
-          - { CC: gcc,   CXX: g++ }
-          - { CC: clang, CXX: clang++ }
+          - { CC: gcc, CXX: g++, type: Debug }
+          - { CC: gcc, CXX: g++, type: Release }
+          - { CC: clang, CXX: clang++, type: Debug }
+          - { CC: clang, CXX: clang++, type: Release }
     steps:
       - uses: actions/checkout@v2
       - name: "Install dependencies"
@@ -39,7 +41,8 @@ jobs:
         run: |
           mkdir -p build && cd build
           cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.CC }} \
-                -DCMAKE_CXX_COMPILER=${{ matrix.compiler.CXX }} .. \
+                -DCMAKE_CXX_COMPILER=${{ matrix.compiler.CXX }}  \
+                -DCMAKE_BUILD_TYPE=${{ matrix.compiler.type }} .. \
               && make -j4 \
               && cd ..
           tar -czvf build.tar.gz build
