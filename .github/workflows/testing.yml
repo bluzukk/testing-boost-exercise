@@ -48,18 +48,26 @@ jobs:
           tar -czf build.tar.gz build
       - uses: actions/upload-artifact@v2
         with:
-          name: build
+          name: build.${{ matrix.compiler.CC }}.${{ matrix.compiler.type }}
           path: build.tar.gz
           retention-days: 3
 
   test:
     needs: build
     runs-on: ubuntu-latest
+    # Not sure but I guess we should test all compilers here too?!
+    strategy:
+      matrix:
+        compiler:
+          - { CC: gcc, CXX: g++, type: Debug }
+          - { CC: gcc, CXX: g++, type: Release }
+          - { CC: clang, CXX: clang++, type: Debug }
+          - { CC: clang, CXX: clang++, type: Release }
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
-          name: build
+          name: build.${{ matrix.compiler.CC }}.${{ matrix.compiler.type }}
       - name: "Install dependencies"
         run: |
           sudo apt update && sudo apt install -y \
