@@ -39,7 +39,7 @@ jobs:
           mkdir -p build && cd build
           cmake -DCMAKE_C_COMPILER=${{ matrix.compiler }} .. \
                 && make -j4 \
-                && cd .. \
+                && cd ..
           tar -czvf build.tar.gz build
       - uses: actions/upload-artifact@v2
         with:
