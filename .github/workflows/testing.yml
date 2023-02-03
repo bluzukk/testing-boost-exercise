@@ -14,8 +14,8 @@ jobs:
       - name: "Run stylecheck"
         run: |
           clang-format -Werror --dry-run \
-                src/*.cpp src/*.hpp \
-                tests/*.cpp tests.*.hpp
+              src/*.cpp src/*.hpp \
+              tests/*.cpp tests.*.hpp
           #clang-format -i src/*.cpp src/*.hpp tests/*.cpp tests.*.hpp > /dev/null 2>&1 || echo "Consider the following changes: " && git --no-pager diff && exit -1
 
   build:
@@ -29,17 +29,18 @@ jobs:
         run: |
           export DEBIAN_FRONTEND="noninteractive"
           sudo apt update && sudo apt install -y \
-                cmake \
-                build-essential \
-                libeigen3-dev \
-                libyaml-cpp-dev \
-                libboost-all-dev
+              cmake \
+              build-essential \
+              libeigen3-dev \
+              libyaml-cpp-dev \
+              libboost-all-dev
       - name: "Build ..."
         run: |
           mkdir -p build && cd build
-          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler }} .. \
-                && make -j4 \
-                && cd ..
+          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler }} \
+                -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} .. \
+              && make -j4 \
+              && cd ..
           tar -czvf build.tar.gz build
       - uses: actions/upload-artifact@v2
         with:
@@ -57,8 +58,8 @@ jobs:
           name: build
       - name: "Testing ..."
         run : |
-          tar -xvf build.tar.gz \
-            && cd build
-            && make test
+          tar -xvf build.tar.gz
+          cd build
+          make test
 
 
