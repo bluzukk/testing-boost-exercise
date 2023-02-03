@@ -23,8 +23,8 @@ jobs:
     strategy:
       matrix:
         compiler:
-          - { compiler: GCC,   CC: gcc,   CXX: g++ }
-          - { compiler: CLANG, CC: clang, CXX: clang++ }
+          - { CC: gcc,   CXX: g++ }
+          - { CC: clang, CXX: clang++ }
     steps:
       - uses: actions/checkout@v2
       - name: "Install dependencies"
@@ -60,8 +60,9 @@ jobs:
           name: build
       - name: "Testing ..."
         run : |
-          tar -xvf build.tar.gz
+          tar -xf build.tar.gz
           cd build
           make test
+          cat /home/runner/work/testing-boost-exercise/testing-boost-exercise/build/Testing/Temporary/LastTest.log
 
 
