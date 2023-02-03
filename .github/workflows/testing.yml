@@ -1,22 +1,20 @@
-name:
+name: CI
 
 on: push
 
-
 jobs:
-#   style:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v2
-#       - uses: actions/setup-python@v2
-#       - name: "Install dependencies"
-#         run: |
-#           sudo apt update
-#           apt install -y clang-format
-#           export DEBIAN_FRONTEND="noninteractive"
-#           apt-get update && apt-get install -y apt-utils curl wget cmake build-essential
-#           apt-get install -y libboost-filesystem-dev libboost-container-dev
-#
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Install clang-format"
+        run: |
+          sudo apt update
+          sudo apt install -y clang-format
+      - name: "Run stylecheck"
+        run: |
+          clang-format -i src/* tests/*
+          git --no-pager diff
   build:
     runs-on: ubuntu-latest
     steps:
