@@ -1,6 +1,6 @@
-name: ci
+name: CI
 
-on: push
+on: [push]
 
 jobs:
   style:
@@ -20,6 +20,9 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
     steps:
       - uses: actions/checkout@v2
       - name: "Install dependencies"
@@ -34,7 +37,9 @@ jobs:
       - name: "Build ..."
         run: |
           mkdir -p build && cd build
-          cmake .. && make -j4 && cd ..
+          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler }} .. \
+                && make -j4 \
+                && cd .. \
           tar -czvf build.tar.gz build
       - uses: actions/upload-artifact@v2
         with:
