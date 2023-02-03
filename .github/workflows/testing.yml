@@ -12,9 +12,7 @@ jobs:
           sudo apt update
           sudo apt install -y clang-format
       - name: "Run stylecheck"
-        run: |
-          clang-format -i src/* tests/*
-          git --no-pager diff
+        run: clang-format -i src/* tests/* > /dev/null 2>&1 || echo "There are style errors:. \nConsider the following changes: " && git --no-pager diff && >&2 echo "\nConsider using clang-format."
   build:
     runs-on: ubuntu-latest
     steps:
