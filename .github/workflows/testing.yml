@@ -1,0 +1,94 @@
+name: CI
+
+on: [push]
+
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Install clang-format"
+        run: |
+          sudo apt update
+          sudo apt install -y clang-format
+      - name: "Run stylecheck"
+        run: |
+          # Overengineering the style check for fun...
+          if clang-format -Werror --dry-run src/*.cpp src/*.hpp tests/*.cpp ; then \
+              echo "No style errors found :)"; \
+          else \
+              echo "Clang-format found errors :("; \
+              clang-format -i src/*.cpp src/*.hpp tests/*.cpp; \
+              echo "Consider the following changes:"; \
+              git --no-pager diff; \
+              echo "You can use clang-format -i to apply these changes to your code."; \
+              exit 1; \
+          fi
+
+          # This also works just fine
+          #clang-format -Werror --dry-run \
+          #    src/*.cpp src/*.hpp \
+          #    tests/*.cpp
+              
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler:
+          - { CC: gcc, CXX: g++, type: Debug }
+          - { CC: gcc, CXX: g++, type: Release }
+          - { CC: clang, CXX: clang++, type: Debug }
+          - { CC: clang, CXX: clang++, type: Release }
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Install dependencies"
+        run: |
+          sudo apt update && sudo apt install -y \
+              cmake \
+              build-essential \
+              libeigen3-dev \
+              libyaml-cpp-dev \
+              libboost-all-dev
+      - name: "Build ..."
+        run: |
+          mkdir -p build && cd build
+          cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.CC }} \
+                -DCMAKE_CXX_COMPILER=${{ matrix.compiler.CXX }}  \
+                -DCMAKE_BUILD_TYPE=${{ matrix.compiler.type }} .. \
+              && make -j4 \
+              && cd ..
+          tar -czf build.tar.gz build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build.${{ matrix.compiler.CC }}.${{ matrix.compiler.type }}
+          path: build.tar.gz
+          retention-days: 3
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    # Not sure but I guess we should test all compilers here too?!
+    strategy:
+      matrix:
+        compiler:
+          - { CC: gcc, CXX: g++, type: Debug }
+          - { CC: gcc, CXX: g++, type: Release }
+          - { CC: clang, CXX: clang++, type: Debug }
+          - { CC: clang, CXX: clang++, type: Release }
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: build.${{ matrix.compiler.CC }}.${{ matrix.compiler.type }}
+      - name: "Install dependencies"
+        run: |
+          sudo apt update && sudo apt install -y \
+              libeigen3-dev \
+              libyaml-cpp-dev \
+              libboost-all-dev
+      - name: "Testing ..."
+        run : |
+          tar -xf build.tar.gz
+          cd build
+          make test
+
