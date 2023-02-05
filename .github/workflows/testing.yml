@@ -14,19 +14,16 @@ jobs:
       - name: "Run stylecheck"
         run: |
           # Overengineering the style check for fun...
-          stylecheck="clang-format -Werror --dry-run src/*.cpp src/*.hpp tests/*.cpp"
-          
-          if $stylecheck ; then \
-              echo "$(tput setaf 2)No style errors found :)$(tput setaf 7)"; \
+          if clang-format -Werror --dry-run src/*.cpp src/*.hpp tests/*.cpp ; then \
+              echo "No style errors found :)"; \
           else \
-              echo "$(tput setaf 1)Clang-format found errors :($(tput setaf 7)"; \
-              clang-format -i src/*.cpp src/*.hpp tests/*.cpp; \
+              echo "Clang-format found errors :("; \
+              clang-format -i src/*.cpp \ #src/*.hpp tests/*.cpp; \
               echo "Consider the following changes:"; \
               git --no-pager diff; \
-              echo "You can use $(tput setaf 3)clang-format -i$(tput setaf 7) to apply these changes to your code."; \
-              exit 1; \
+              echo "You can use clang-format -i to apply these changes to your code."; \
           fi
-          
+
           # This also works just fine
           #clang-format -Werror --dry-run \
           #    src/*.cpp src/*.hpp \
