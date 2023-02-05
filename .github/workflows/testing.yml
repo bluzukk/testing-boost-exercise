@@ -14,7 +14,7 @@ jobs:
       - name: "Run stylecheck"
         run: |
           # Overengineering the style check for fun...
-          if clang-format -Werror --dry-run src/*.cpp ; then \
+          if clang-format -Werror --dry-run src/*.cpp src/*.hpp tests/*.cpp ; then \
               echo "No style errors found :)"; \
           else \
               echo "Clang-format found errors :("; \
