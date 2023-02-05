@@ -22,6 +22,7 @@ jobs:
               echo "Consider the following changes:"; \
               git --no-pager diff; \
               echo "You can use clang-format -i to apply these changes to your code."; \
+              exit 1; \
           fi
 
           # This also works just fine
